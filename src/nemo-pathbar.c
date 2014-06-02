@@ -554,8 +554,8 @@ nemo_path_bar_size_allocate (GtkWidget     *widget,
 	up_slider_offset = 0;
 	down_slider_offset = 0;
 	path_bar = NEMO_PATH_BAR (widget);
-    allocation->y += 3;
-    allocation->height -= 6;
+    allocation->y += 1;
+    allocation->height -= 2;
 
 	gtk_widget_set_allocation (widget, allocation);
 

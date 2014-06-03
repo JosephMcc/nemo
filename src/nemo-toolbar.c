@@ -349,9 +349,6 @@ nemo_toolbar_constructed (GObject *obj)
                   "changed::" NEMO_PREFERENCES_SHOW_SEARCH_ICON_TOOLBAR,
                   G_CALLBACK (toolbar_update_appearance), self);
     g_signal_connect_swapped (nemo_preferences,
-                  "changed::" NEMO_PREFERENCES_SHOW_LABEL_SEARCH_ICON_TOOLBAR,
-                  G_CALLBACK (toolbar_update_appearance), self);
-    g_signal_connect_swapped (nemo_preferences,
                   "changed::" NEMO_PREFERENCES_SHOW_NEW_FOLDER_ICON_TOOLBAR,
                   G_CALLBACK (toolbar_update_appearance), self);
 

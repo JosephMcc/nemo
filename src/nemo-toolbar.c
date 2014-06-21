@@ -301,17 +301,10 @@ nemo_toolbar_constructed (GObject *obj)
     box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
     gtk_widget_show (GTK_WIDGET (box));
 
-<<<<<<< HEAD
     self->priv->toggle_location_button = toolbar_create_toolbutton (self, FALSE, NEMO_ACTION_TOGGLE_LOCATION);
     gtk_container_add (GTK_CONTAINER (box), self->priv->toggle_location_button);
 
     self->priv->new_folder_button = toolbar_create_toolbutton (self, FALSE, NEMO_ACTION_NEW_FOLDER);
-=======
-    self->priv->toggle_location_button = toolbar_create_toolbutton (self, FALSE, NEMO_ACTION_TOGGLE_LOCATION);
-    gtk_container_add (GTK_CONTAINER (box), self->priv->toggle_location_button);
-
-    self->priv->new_folder_button = toolbar_create_toolbutton (self, FALSE, NEMO_ACTION_NEW_FOLDER);
->>>>>>> e5a7c7312ddf58815e682bf0fb1d48a0f0a4519f
     gtk_container_add (GTK_CONTAINER (box), self->priv->new_folder_button);
 
     self->priv->search_button = toolbar_create_toolbutton (self, TRUE, NEMO_ACTION_SEARCH);

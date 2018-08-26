@@ -94,6 +94,7 @@ typedef struct {
     GtkWidget *image;
     GtkWidget *label;
     GtkWidget *alignment;
+    GtkWidget *arrow_icon;
     guint ignore_changes : 1;
     guint fake_root : 1;
 } ButtonData;
@@ -168,7 +169,6 @@ get_slider_button (NemoPathBar     *path_bar,
     gtk_widget_push_composite_child ();
 
     button = gtk_button_new ();
-    gtk_style_context_add_class (gtk_widget_get_style_context (button), "slider-button");
     gtk_button_set_focus_on_click (GTK_BUTTON (button), FALSE);
     gtk_widget_add_events (button, GDK_SCROLL_MASK);
 
@@ -373,9 +373,6 @@ nemo_path_bar_init (NemoPathBar *path_bar)
               "drag-leave",
               G_CALLBACK (nemo_path_bar_slider_drag_leave),
               path_bar);
-
-    gtk_style_context_add_class (gtk_widget_get_style_context (GTK_WIDGET (path_bar)), GTK_STYLE_CLASS_LINKED);
-    gtk_style_context_add_class (gtk_widget_get_style_context (GTK_WIDGET (path_bar)), "path-bar");
 }
 
 static void
@@ -1824,17 +1821,19 @@ make_directory_button (NemoPathBar  *path_bar,
 
     setup_button_type (button_data, path_bar, path);
     button_data->button = gtk_toggle_button_new ();
-    gtk_style_context_add_class (gtk_widget_get_style_context (button_data->button),
-                                 "text-button");
     gtk_button_set_focus_on_click (GTK_BUTTON (button_data->button), FALSE);
     gtk_widget_add_events (button_data->button, GDK_SCROLL_MASK);
     /* TODO update button type when xdg directories change */
 
     button_data->image = gtk_image_new ();
+    button_data->arrow_icon = gtk_image_new_from_icon_name ("pan-end-symbolic", GTK_ICON_SIZE_MENU);
 
     switch (button_data->type) {
         case ROOT_BUTTON:
-            child = button_data->image;
+            child = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
+            gtk_box_pack_start (GTK_BOX (child), button_data->image, FALSE, FALSE, 0);
+            gtk_box_pack_start (GTK_BOX (child), button_data->arrow_icon, FALSE, FALSE, 0);
+            // child = button_data->image;
             button_data->label = NULL;
             break;
         case HOME_BUTTON:
@@ -1843,16 +1842,18 @@ make_directory_button (NemoPathBar  *path_bar,
         case DEFAULT_LOCATION_BUTTON:
             button_data->label = gtk_label_new (NULL);
             child = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
-            gtk_box_pack_start (GTK_BOX (child), button_data->image, FALSE, FALSE, 0);
+            // gtk_box_pack_start (GTK_BOX (child), button_data->image, FALSE, FALSE, 0);
             gtk_box_pack_start (GTK_BOX (child), button_data->label, FALSE, FALSE, 0);
+            gtk_box_pack_start (GTK_BOX (child), button_data->arrow_icon, FALSE, FALSE, 0);
             break;
         case XDG_BUTTON:
         case NORMAL_BUTTON:
         default:
             button_data->label = gtk_label_new (NULL);
             child = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
-            gtk_box_pack_start (GTK_BOX (child), button_data->image, FALSE, FALSE, 0);
+            // gtk_box_pack_start (GTK_BOX (child), button_data->image, FALSE, FALSE, 0);
             gtk_box_pack_start (GTK_BOX (child), button_data->label, FALSE, FALSE, 0);
+            gtk_box_pack_start (GTK_BOX (child), button_data->arrow_icon, FALSE, FALSE, 0);
             button_data->is_base_dir = base_dir;
     }
     if (button_data->label != NULL) {

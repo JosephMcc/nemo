@@ -74,11 +74,13 @@ NemoDesktopWindow GtkPaned {
     padding: 0;
     border: none;
     background: none;
+    color: @theme_fg_color;
 }
 
 .nemo-navigation-bar button label,
 .nemo-navigation-bar button image {
     padding: 0;
+    color: @theme_fg_color;
 }
 
 .nemo-navigation-bar button:hover,
@@ -91,6 +93,7 @@ NemoDesktopWindow GtkPaned {
 
 .nemo-navigation-bar button:checked {
     font-weight: bold;
+    color: @theme_fg_color;
 }
 
 .nemo-navigation-bar entry {

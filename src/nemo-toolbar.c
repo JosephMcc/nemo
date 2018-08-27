@@ -271,6 +271,19 @@ toolbar_create_toolbutton (NemoToolbar *self,
 }
 
 static void
+path_style_button_clicked_cb (GtkButton *button,
+                              gpointer   user_data)
+{
+    NemoToolbar *self = NEMO_TOOLBAR (user_data);
+
+    if (gtk_stack_get_visible_child (GTK_STACK (self->priv->stack)) == self->priv->location_bar) {
+        gtk_stack_set_visible_child (GTK_STACK (self->priv->stack), self->priv->path_bar);
+    } else {
+        gtk_stack_set_visible_child (GTK_STACK (self->priv->stack), self->priv->location_bar);
+    }
+}
+
+static void
 nemo_toolbar_constructed (GObject *obj)
 {
 	NemoToolbar *self = NEMO_TOOLBAR (obj);
@@ -280,6 +293,8 @@ nemo_toolbar_constructed (GObject *obj)
     GtkWidget *box;
 	GtkStyleContext *context;
     GtkWidget *frame;
+    GtkWidget *path_style_button;
+    GtkWidget *path_box;
 
 	G_OBJECT_CLASS (nemo_toolbar_parent_class)->constructed (obj);
 
@@ -364,10 +379,22 @@ nemo_toolbar_constructed (GObject *obj)
     frame = gtk_frame_new (NULL);
     gtk_style_context_add_class (gtk_widget_get_style_context (frame), "nemo-navigation-bar");
     gtk_box_pack_start (GTK_BOX (hbox), frame, TRUE, TRUE, 0);
-    gtk_container_add (GTK_CONTAINER (frame), self->priv->stack);
+    path_box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
+    gtk_container_add (GTK_CONTAINER (frame), path_box);
+    // box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
+    path_style_button = gtk_button_new_from_icon_name ("folder-symbolic", GTK_ICON_SIZE_MENU);
+    g_signal_connect (path_style_button, "clicked", G_CALLBACK (path_style_button_clicked_cb), self);
+    gtk_box_pack_start (GTK_BOX (path_box), path_style_button, FALSE, FALSE, 0);
+    // gtk_box_pack_start (GTK_BOX (box), gtk_image_new_from_icon_name ("nemo-next-symbolic", GTK_ICON_SIZE_MENU), FALSE, FALSE, 0);
+    // gtk_box_pack_start (GTK_BOX (path_box), box, FALSE, FALSE, 0);
+    // gtk_box_pack_start (GTK_BOX (box), gtk_image_new_from_icon_name ("nemo-next-symbolic", GTK_ICON_SIZE_MENU), FALSE, FALSE, 0);
+    gtk_box_pack_start (GTK_BOX (path_box), self->priv->stack, TRUE, TRUE, 0);
 
+    box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
+    gtk_box_pack_start (GTK_BOX (box), gtk_image_new_from_icon_name ("nemo-next-symbolic", GTK_ICON_SIZE_MENU), FALSE, FALSE, 0);
     self->priv->path_bar = g_object_new (NEMO_TYPE_PATH_BAR, NULL);
-    gtk_stack_add_named(GTK_STACK (self->priv->stack), GTK_WIDGET (self->priv->path_bar), "path_bar");
+    gtk_box_pack_start (GTK_BOX (box), self->priv->path_bar, TRUE, TRUE, 0);
+    gtk_stack_add_named(GTK_STACK (self->priv->stack), GTK_WIDGET (box), "path_bar");
     
     /* Entry-Like Location Bar */
     self->priv->location_bar = nemo_location_bar_new ();

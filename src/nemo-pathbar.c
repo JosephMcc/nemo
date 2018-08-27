@@ -127,8 +127,10 @@ struct _NemoPathBarDetails {
 	GList *fake_root;
 	GtkWidget *up_slider_button;
 	GtkWidget *down_slider_button;
+    GtkWidget *location_button;
 	guint settings_signal_id;
 	gint slider_width;
+    gint location_button_width;
 	gint16 spacing;
 	gint16 button_offset;
 	guint timer;
@@ -184,6 +186,27 @@ get_slider_button (NemoPathBar     *path_bar,
         image = gtk_image_new_from_icon_name ("pan-end-symbolic", GTK_ICON_SIZE_MENU);
     }
 
+    gtk_container_add (GTK_CONTAINER (button), image);
+    gtk_container_add (GTK_CONTAINER (path_bar), button);
+    gtk_widget_show_all (button);
+
+    gtk_widget_pop_composite_child ();
+
+    return button;
+}
+
+static GtkWidget *
+get_location_button (NemoPathBar *path_bar)
+{
+    GtkWidget *button;
+    GtkWidget *image;
+
+    gtk_widget_push_composite_child ();
+
+    button = gtk_button_new ();
+    gtk_button_set_focus_on_click (GTK_BUTTON (button), FALSE);
+
+    image = gtk_image_new_from_icon_name ("folder-symbolic", GTK_ICON_SIZE_MENU);
     gtk_container_add (GTK_CONTAINER (button), image);
     gtk_container_add (GTK_CONTAINER (path_bar), button);
     gtk_widget_show_all (button);
@@ -324,6 +347,7 @@ nemo_path_bar_init (NemoPathBar *path_bar)
     gtk_widget_set_redraw_on_allocate (GTK_WIDGET (path_bar), FALSE);
 
     path_bar->priv->up_slider_button = get_slider_button (path_bar, GTK_POS_LEFT);
+    path_bar->priv->location_button = get_location_button (path_bar);
     path_bar->priv->down_slider_button = get_slider_button (path_bar, GTK_POS_RIGHT);
 
     p = nemo_get_desktop_directory ();
@@ -466,8 +490,12 @@ nemo_path_bar_get_preferred_width (GtkWidget *widget,
                                     &path_bar->priv->slider_width,
                                     NULL);
 
-    *minimum += path_bar->priv->slider_width * 2;
-    *natural += path_bar->priv->slider_width * 2;
+    gtk_widget_get_preferred_width (path_bar->priv->location_button,
+                                    &path_bar->priv->location_button_width,
+                                    NULL);
+
+    *minimum += (path_bar->priv->slider_width * 2) + (path_bar->priv->location_button_width);
+    *natural += (path_bar->priv->slider_width * 2) + (path_bar->priv->location_button_width);
 }
 
 static void
@@ -543,6 +571,9 @@ child_ordering_changed (NemoPathBar *path_bar)
     if (path_bar->priv->up_slider_button) {
         gtk_style_context_invalidate (gtk_widget_get_style_context (path_bar->priv->up_slider_button));
     }
+    if (path_bar->priv->location_button) {
+        gtk_style_context_invalidate (gtk_widget_get_style_context (path_bar->priv->location_button));
+    }
     if (path_bar->priv->down_slider_button) {
         gtk_style_context_invalidate (gtk_widget_get_style_context (path_bar->priv->down_slider_button));
     }
@@ -597,18 +628,21 @@ nemo_path_bar_size_allocate (GtkWidget     *widget,
                                     &path_bar->priv->slider_width,
                                     NULL);
 
+    gtk_widget_get_preferred_width (path_bar->priv->location_button,
+                                    &path_bar->priv->location_button_width,
+                                    NULL);
+
     gtk_widget_get_preferred_size (BUTTON_DATA (path_bar->priv->button_list->data)->container,
                        NULL, &child_requisition);
     width = child_requisition.width;
 
     for (list = path_bar->priv->button_list->next; list; list = list->next) {
         child = BUTTON_DATA (list->data)->button;
-        gtk_widget_get_preferred_size (child,
-                       NULL, &child_requisition);
+        gtk_widget_get_preferred_size (child, NULL, &child_requisition);
         width += child_requisition.width;
 
         if (list == path_bar->priv->fake_root) {
-            width += path_bar->priv->slider_width;
+            width += path_bar->priv->slider_width + path_bar->priv->location_button_width;
             break;
         }
     }
@@ -626,7 +660,7 @@ nemo_path_bar_size_allocate (GtkWidget     *widget,
         gint slider_space;
         reached_end = FALSE;
 		need_sliders = TRUE;
-        slider_space = 2 * path_bar->priv->slider_width;
+        slider_space = (2 * path_bar->priv->slider_width) + (path_bar->priv->location_button_width);
         largest_width -= slider_space;
 
         /* To see how much space we have, and how many buttons we can display.
@@ -683,7 +717,7 @@ nemo_path_bar_size_allocate (GtkWidget     *widget,
         }
 
         /* Finally, we walk up, seeing how many of the previous buttons we can add*/
-        while (pathbar_root_button->next && ! reached_end) {
+        while (pathbar_root_button->next && !reached_end) {
             if (pathbar_root_button == path_bar->priv->fake_root) {
                 break;
             }
@@ -726,14 +760,14 @@ nemo_path_bar_size_allocate (GtkWidget     *widget,
     if (direction == GTK_TEXT_DIR_RTL) {
         child_allocation.x = allocation->x + allocation->width;
         if (need_sliders || path_bar->priv->fake_root) {
-            child_allocation.x -= (path_bar->priv->slider_width);
-            up_slider_offset = allocation->width - path_bar->priv->slider_width;
+            child_allocation.x -= (path_bar->priv->slider_width) + path_bar->priv->location_button_width;
+            up_slider_offset = allocation->width - path_bar->priv->slider_width - path_bar->priv->location_button_width;
         }
     } else {
         child_allocation.x = allocation->x;
         if (need_sliders || path_bar->priv->fake_root) {
             up_slider_offset = 0;
-            child_allocation.x += path_bar->priv->slider_width;
+            child_allocation.x += path_bar->priv->slider_width + path_bar->priv->location_button_width;
         }
     }
 
@@ -749,12 +783,12 @@ nemo_path_bar_size_allocate (GtkWidget     *widget,
         }
     	/* Check to see if we've don't have any more space to allocate buttons */
         if (need_sliders && direction == GTK_TEXT_DIR_RTL) {
-            if (child_allocation.x - path_bar->priv->slider_width < allocation->x) {
+            if (child_allocation.x - path_bar->priv->slider_width - path_bar->priv->location_button_width < allocation->x) {
                 break;
             }
         } else {
             if (need_sliders && direction == GTK_TEXT_DIR_LTR) {
-                if (child_allocation.x + child_allocation.width + path_bar->priv->slider_width > allocation->x + allocation->width) {
+                if (child_allocation.x + child_allocation.width + path_bar->priv->slider_width + path_bar->priv->location_button_width > allocation->x + allocation->width) {
                     break;
                 }
             }
@@ -765,7 +799,7 @@ nemo_path_bar_size_allocate (GtkWidget     *widget,
         gtk_widget_size_allocate (child, &child_allocation);
 
         if (direction == GTK_TEXT_DIR_RTL) {
-            down_slider_offset = child_allocation.x - allocation->x - path_bar->priv->slider_width;
+            down_slider_offset = child_allocation.x - allocation->x - path_bar->priv->slider_width - path_bar->priv->location_button_width;
         } else {
             down_slider_offset += child_allocation.width;
             child_allocation.x += child_allocation.width;
@@ -793,24 +827,28 @@ nemo_path_bar_size_allocate (GtkWidget     *widget,
     }
 
     if (need_sliders || path_bar->priv->fake_root) {
-        child_allocation.width = path_bar->priv->slider_width;
+        child_allocation.width = path_bar->priv->slider_width + path_bar->priv->location_button_width;
         child_allocation.x = up_slider_offset + allocation->x;
         gtk_widget_size_allocate (path_bar->priv->up_slider_button, &child_allocation);
+        gtk_widget_size_allocate (path_bar->priv->location_button, &child_allocation);
 
         needs_reorder |= gtk_widget_get_child_visible (path_bar->priv->up_slider_button) == FALSE;
         gtk_widget_set_child_visible (path_bar->priv->up_slider_button, TRUE);
+        // gtk_widget_set_child_visible (path_bar->priv->location_button, TRUE);
         gtk_widget_show_all (path_bar->priv->up_slider_button);
+        gtk_widget_show_all (path_bar->priv->location_button);
 
         if (direction == GTK_TEXT_DIR_LTR) {
-            down_slider_offset += path_bar->priv->slider_width;
+            down_slider_offset += path_bar->priv->slider_width + path_bar->priv->location_button_width;
         }
     } else {
         needs_reorder |= gtk_widget_get_child_visible (path_bar->priv->up_slider_button) == TRUE;
         gtk_widget_set_child_visible (path_bar->priv->up_slider_button, FALSE);
+        // gtk_widget_set_child_visible (path_bar->priv->location_button, FALSE);
     }
 
     if (need_sliders) {
-        child_allocation.width = path_bar->priv->slider_width;
+        child_allocation.width = path_bar->priv->slider_width + path_bar->priv->location_button_width;
         child_allocation.x = down_slider_offset + allocation->x;
         gtk_widget_size_allocate (path_bar->priv->down_slider_button, &child_allocation);
 
@@ -1050,6 +1088,7 @@ nemo_path_bar_get_path_for_child (GtkContainer *container,
         visible_children = NULL;
 
         if (gtk_widget_get_visible (path_bar->priv->down_slider_button) &&
+            gtk_widget_get_child_visible (path_bar->priv->location_button) &&
             gtk_widget_get_child_visible (path_bar->priv->down_slider_button)) {
             visible_children = g_list_prepend (visible_children, path_bar->priv->down_slider_button);
         }
@@ -1063,6 +1102,13 @@ nemo_path_bar_get_path_for_child (GtkContainer *container,
         }
 
         if (gtk_widget_get_visible (path_bar->priv->up_slider_button) &&
+            gtk_widget_get_child_visible (path_bar->priv->location_button) &&
+            gtk_widget_get_child_visible (path_bar->priv->up_slider_button)) {
+            visible_children = g_list_prepend (visible_children, path_bar->priv->location_button);
+        }
+
+        if (gtk_widget_get_visible (path_bar->priv->up_slider_button) &&
+            gtk_widget_get_child_visible (path_bar->priv->location_button) &&
             gtk_widget_get_child_visible (path_bar->priv->up_slider_button)) {
             visible_children = g_list_prepend (visible_children, path_bar->priv->up_slider_button);
         }
@@ -1847,32 +1893,36 @@ make_directory_button (NemoPathBar  *path_bar,
         case DESKTOP_BUTTON:
         case MOUNT_BUTTON:
         case DEFAULT_LOCATION_BUTTON:
+        {
+            GtkWidget *separator_label;
+
+            separator_label = gtk_label_new (G_DIR_SEPARATOR_S);
+            gtk_style_context_add_class (gtk_widget_get_style_context (separator_label), "dim-label");
             button_data->label = gtk_label_new (NULL);
             child = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
-            // gtk_box_pack_start (GTK_BOX (child), button_data->image, FALSE, FALSE, 0);
-            gtk_box_pack_start (GTK_BOX (child), button_data->label, FALSE, FALSE, 0);
             button_data->container = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
+            gtk_box_pack_start (GTK_BOX (button_data->container), separator_label, FALSE, FALSE, 0);
             gtk_box_pack_start (GTK_BOX (button_data->container), button_data->button, FALSE, FALSE, 0);
-            gtk_box_pack_start (GTK_BOX (button_data->container),
-                                gtk_image_new_from_icon_name ("nemo-next-symbolic", GTK_ICON_SIZE_MENU),
-                                FALSE, FALSE,  0);
-            // gtk_box_pack_start (GTK_BOX (child), button_data->arrow_icon, FALSE, FALSE, 0);
-            break;
+            gtk_box_pack_start (GTK_BOX (child), button_data->label, FALSE, FALSE, 0);
+        }
+        break;
         case XDG_BUTTON:
         case NORMAL_BUTTON:
         default:
+        {
+            GtkWidget *separator_label;
+
+            separator_label = gtk_label_new (G_DIR_SEPARATOR_S);
+            gtk_style_context_add_class (gtk_widget_get_style_context (separator_label), "dim-label");
             button_data->label = gtk_label_new (NULL);
             child = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
-            // gtk_box_pack_start (GTK_BOX (child), button_data->image, FALSE, FALSE, 0);
-            gtk_box_pack_start (GTK_BOX (child), button_data->label, FALSE, FALSE, 0);
             button_data->container = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
-            // gtk_box_pack_start (GTK_BOX (button_data->container), gtk_label_new (G_DIR_SEPARATOR_S), FALSE, FALSE, 0);
+            gtk_box_pack_start (GTK_BOX (button_data->container), separator_label, FALSE, FALSE, 0);
             gtk_box_pack_start (GTK_BOX (button_data->container), button_data->button, FALSE, FALSE, 0);
-            gtk_box_pack_start (GTK_BOX (button_data->container),
-                                gtk_image_new_from_icon_name ("nemo-next-symbolic", GTK_ICON_SIZE_MENU),
-                                FALSE, FALSE,  0);
-            // gtk_box_pack_start (GTK_BOX (child), button_data->arrow_icon, FALSE, FALSE, 0);
+            gtk_box_pack_start (GTK_BOX (child), button_data->label, FALSE, FALSE, 0);
             button_data->is_base_dir = base_dir;
+        }
+        break;
     }
     if (button_data->label != NULL) {
         gtk_label_set_ellipsize (GTK_LABEL (button_data->label), PANGO_ELLIPSIZE_MIDDLE);

@@ -94,7 +94,9 @@ typedef struct {
     GtkWidget *image;
     GtkWidget *label;
     GtkWidget *alignment;
-    GtkWidget *arrow_icon;
+    // GtkWidget *arrow_icon;
+    GtkWidget *separator;
+    GtkWidget *container;
     guint ignore_changes : 1;
     guint fake_root : 1;
 } ButtonData;
@@ -169,6 +171,7 @@ get_slider_button (NemoPathBar     *path_bar,
     gtk_widget_push_composite_child ();
 
     button = gtk_button_new ();
+    gtk_style_context_add_class (gtk_widget_get_style_context (button), "slider-button");
     gtk_button_set_focus_on_click (GTK_BUTTON (button), FALSE);
     gtk_widget_add_events (button, GDK_SCROLL_MASK);
 
@@ -452,8 +455,8 @@ nemo_path_bar_get_preferred_width (GtkWidget *widget,
 
     for (list = path_bar->priv->button_list; list; list = list->next) {
         button_data = BUTTON_DATA (list->data);
-        gtk_widget_get_preferred_width (button_data->button, &child_min, &child_nat);
-        gtk_widget_get_preferred_height (button_data->button, &child_height, NULL);
+        gtk_widget_get_preferred_width (button_data->container, &child_min, &child_nat);
+        gtk_widget_get_preferred_height (button_data->container, &child_height, NULL);
         height = MAX (height, child_height);
         *minimum = MAX (*minimum, child_min);
         *natural = MAX (*natural, child_nat);
@@ -483,7 +486,7 @@ nemo_path_bar_get_preferred_height (GtkWidget *widget,
 
     for (list = path_bar->priv->button_list; list; list = list->next) {
         button_data = BUTTON_DATA (list->data);
-       gtk_widget_get_preferred_height (button_data->button, &child_min, &child_nat);
+       gtk_widget_get_preferred_height (button_data->container, &child_min, &child_nat);
 
         *minimum = MAX (*minimum, child_min);
         *natural = MAX (*natural, child_nat);
@@ -495,17 +498,18 @@ nemo_path_bar_update_slider_buttons (NemoPathBar *path_bar)
 {
     if (path_bar->priv->button_list) {
 
-        GtkWidget *button;
+        // GtkWidget *button;
+        GtkWidget *container;
 
-        button = BUTTON_DATA (path_bar->priv->button_list->data)->button;
-        if (gtk_widget_get_child_visible (button)) {
+        container = BUTTON_DATA (path_bar->priv->button_list->data)->container;
+        if (gtk_widget_get_child_visible (container)) {
             gtk_widget_set_sensitive (path_bar->priv->down_slider_button, FALSE);
             nemo_path_bar_stop_scrolling (path_bar);
         } else {
             gtk_widget_set_sensitive (path_bar->priv->down_slider_button, TRUE);
         }
-        button = BUTTON_DATA (g_list_last (path_bar->priv->button_list)->data)->button;
-        if (gtk_widget_get_child_visible (button)) {
+        container = BUTTON_DATA (g_list_last (path_bar->priv->button_list)->data)->container;
+        if (gtk_widget_get_child_visible (container)) {
             gtk_widget_set_sensitive (path_bar->priv->up_slider_button, FALSE);
             nemo_path_bar_stop_scrolling (path_bar);
         } else {
@@ -593,7 +597,7 @@ nemo_path_bar_size_allocate (GtkWidget     *widget,
                                     &path_bar->priv->slider_width,
                                     NULL);
 
-    gtk_widget_get_preferred_size (BUTTON_DATA (path_bar->priv->button_list->data)->button,
+    gtk_widget_get_preferred_size (BUTTON_DATA (path_bar->priv->button_list->data)->container,
                        NULL, &child_requisition);
     width = child_requisition.width;
 
@@ -638,7 +642,7 @@ nemo_path_bar_size_allocate (GtkWidget     *widget,
         }
 
         /* Count down the path chain towards the end. */
-        gtk_widget_get_preferred_size (BUTTON_DATA (pathbar_root_button->data)->button,
+        gtk_widget_get_preferred_size (BUTTON_DATA (pathbar_root_button->data)->container,
                                        NULL, &child_requisition);
         button_count = 1;
         width = child_requisition.width;
@@ -649,7 +653,7 @@ nemo_path_bar_size_allocate (GtkWidget     *widget,
             if (list == path_bar->priv->fake_root) {
                 break;
             }
-            child = BUTTON_DATA (list->data)->button;
+            child = BUTTON_DATA (list->data)->container;
             gtk_widget_get_preferred_size (child, NULL, &child_requisition);
 
             if (width + child_requisition.width + slider_space > allocation->width) {
@@ -734,7 +738,7 @@ nemo_path_bar_size_allocate (GtkWidget     *widget,
     }
 
     for (list = pathbar_root_button; list; list = list->prev) {
-        child = BUTTON_DATA (list->data)->button;
+        child = BUTTON_DATA (list->data)->container;
         gtk_widget_get_preferred_size (child,
                                         NULL, &child_requisition);
 
@@ -769,7 +773,7 @@ nemo_path_bar_size_allocate (GtkWidget     *widget,
     }
     /* Now we go hide all the widgets that don't fit */
     while (list) {
-        child = BUTTON_DATA (list->data)->button;
+        child = BUTTON_DATA (list->data)->container;
         needs_reorder |= gtk_widget_get_child_visible (child) == TRUE;
         gtk_widget_set_child_visible (child, FALSE);
         list = list->prev;
@@ -780,7 +784,7 @@ nemo_path_bar_size_allocate (GtkWidget     *widget,
     }
 
     for (list = pathbar_root_button->next; list; list = list->next) {
-        child = BUTTON_DATA (list->data)->button;
+        child = BUTTON_DATA (list->data)->container;
         needs_reorder |= gtk_widget_get_child_visible (child) == TRUE;
         gtk_widget_set_child_visible (child, FALSE);
         if (BUTTON_DATA (list->data)->fake_root) {
@@ -966,7 +970,7 @@ nemo_path_bar_remove (GtkContainer *container,
 
     children = path_bar->priv->button_list;
     while (children) {
-        if (widget == BUTTON_DATA (children->data)->button) {
+        if (widget == BUTTON_DATA (children->data)->container) {
           nemo_path_bar_remove_1 (container, widget);
             path_bar->priv->button_list = g_list_remove_link (path_bar->priv->button_list, children);
             g_list_free_1 (children);
@@ -991,7 +995,7 @@ nemo_path_bar_forall (GtkContainer *container,
     children = path_bar->priv->button_list;
     while (children) {
         GtkWidget *child;
-        child = BUTTON_DATA (children->data)->button;
+        child = BUTTON_DATA (children->data)->container;
         children = children->next;
         (* callback) (child, callback_data);
     }
@@ -1053,9 +1057,9 @@ nemo_path_bar_get_path_for_child (GtkContainer *container,
         for (l = path_bar->priv->button_list; l; l = l->next) {
             ButtonData *data = l->data;
 
-            if (gtk_widget_get_visible (data->button) &&
-                gtk_widget_get_child_visible (data->button))
-                visible_children = g_list_prepend (visible_children, data->button);
+            if (gtk_widget_get_visible (data->container) &&
+                gtk_widget_get_child_visible (data->container))
+                visible_children = g_list_prepend (visible_children, data->container);
         }
 
         if (gtk_widget_get_visible (path_bar->priv->up_slider_button) &&
@@ -1182,7 +1186,7 @@ nemo_path_bar_scroll_down (NemoPathBar *path_bar)
     /* We find the button at the 'down' end, the non visible subfolder of
      * a visible folder, that we have to make visible */
     for (list = path_bar->priv->button_list; list; list = list->next) {
-        if (list->next && gtk_widget_get_child_visible (BUTTON_DATA (list->next->data)->button)) {
+        if (list->next && gtk_widget_get_child_visible (BUTTON_DATA (list->next->data)->container)) {
             down_button = list;
             break;
         }
@@ -1202,7 +1206,7 @@ nemo_path_bar_scroll_down (NemoPathBar *path_bar)
         }
     }
 
-    gtk_widget_get_allocation (BUTTON_DATA (down_button->data)->button, &down_button_allocation);
+    gtk_widget_get_allocation (BUTTON_DATA (down_button->data)->container, &down_button_allocation);
     gtk_widget_get_allocation (GTK_WIDGET (path_bar), &allocation);
     gtk_widget_get_allocation (path_bar->priv->down_slider_button, &slider_allocation);
 
@@ -1239,7 +1243,7 @@ nemo_path_bar_scroll_up (NemoPathBar *path_bar)
 
     /* scroll in parent folder direction */
     for (list = g_list_last (path_bar->priv->button_list); list; list = list->prev) {
-        if (list->prev && gtk_widget_get_child_visible (BUTTON_DATA (list->prev->data)->button)) {
+        if (list->prev && gtk_widget_get_child_visible (BUTTON_DATA (list->prev->data)->container)) {
             if (list->prev == path_bar->priv->fake_root) {
                 path_bar->priv->fake_root = NULL;
             }
@@ -1383,7 +1387,7 @@ void
 nemo_path_bar_clear_buttons (NemoPathBar *path_bar)
 {
     while (path_bar->priv->button_list != NULL) {
-        gtk_container_remove (GTK_CONTAINER (path_bar), BUTTON_DATA (path_bar->priv->button_list->data)->button);
+        gtk_container_remove (GTK_CONTAINER (path_bar), BUTTON_DATA (path_bar->priv->button_list->data)->container);
     }
     path_bar->priv->scrolled_root_button = NULL;
     path_bar->priv->fake_root = NULL;
@@ -1402,7 +1406,7 @@ button_clicked_cb (GtkWidget *button,
         return;
     }
 
-    path_bar = NEMO_PATH_BAR (gtk_widget_get_parent (button));
+    path_bar = NEMO_PATH_BAR (gtk_widget_get_parent (gtk_widget_get_parent (button)));
 
     button_list = g_list_find (path_bar->priv->button_list, button_data);
     g_assert (button_list != NULL);
@@ -1435,6 +1439,8 @@ get_dir_name (ButtonData *button_data)
 {
     if (button_data->type == DESKTOP_BUTTON) {
         return _("Desktop");
+    } else if (button_data->type == ROOT_BUTTON) {
+        return _("File System");
     /*
     }
      * originally this would look like /home/Home/Desktop in the pathbar.
@@ -1778,7 +1784,7 @@ button_data_file_changed (NemoFile *file,
             if (position != -1) {
                 for (idx = 0; idx <= position; idx++) {
                     gtk_container_remove (GTK_CONTAINER (path_bar),
-                                  BUTTON_DATA (path_bar->priv->button_list->data)->button);
+                                  BUTTON_DATA (path_bar->priv->button_list->data)->container);
                 }
             }
         }
@@ -1821,39 +1827,51 @@ make_directory_button (NemoPathBar  *path_bar,
 
     setup_button_type (button_data, path_bar, path);
     button_data->button = gtk_toggle_button_new ();
+    // gtk_style_context_add_class (gtk_widget_get_style_context (button_data->button), "text-button");
     gtk_button_set_focus_on_click (GTK_BUTTON (button_data->button), FALSE);
     gtk_widget_add_events (button_data->button, GDK_SCROLL_MASK);
     /* TODO update button type when xdg directories change */
 
     button_data->image = gtk_image_new ();
-    button_data->arrow_icon = gtk_image_new_from_icon_name ("pan-end-symbolic", GTK_ICON_SIZE_MENU);
+    // button_data->arrow_icon = gtk_image_new_from_icon_name ("pan-end-symbolic", GTK_ICON_SIZE_MENU);
 
     switch (button_data->type) {
         case ROOT_BUTTON:
-            child = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
-            gtk_box_pack_start (GTK_BOX (child), button_data->image, FALSE, FALSE, 0);
-            gtk_box_pack_start (GTK_BOX (child), button_data->arrow_icon, FALSE, FALSE, 0);
+            // // child = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
+            // // gtk_box_pack_start (GTK_BOX (child), button_data->image, FALSE, FALSE, 0);
+            // // gtk_box_pack_start (GTK_BOX (child), button_data->arrow_icon, FALSE, FALSE, 0);
             // child = button_data->image;
-            button_data->label = NULL;
-            break;
+            // button_data->label = NULL;
+            // break;
         case HOME_BUTTON:
         case DESKTOP_BUTTON:
         case MOUNT_BUTTON:
         case DEFAULT_LOCATION_BUTTON:
             button_data->label = gtk_label_new (NULL);
-            child = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
+            child = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
             // gtk_box_pack_start (GTK_BOX (child), button_data->image, FALSE, FALSE, 0);
             gtk_box_pack_start (GTK_BOX (child), button_data->label, FALSE, FALSE, 0);
-            gtk_box_pack_start (GTK_BOX (child), button_data->arrow_icon, FALSE, FALSE, 0);
+            button_data->container = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
+            gtk_box_pack_start (GTK_BOX (button_data->container), button_data->button, FALSE, FALSE, 0);
+            gtk_box_pack_start (GTK_BOX (button_data->container),
+                                gtk_image_new_from_icon_name ("nemo-next-symbolic", GTK_ICON_SIZE_MENU),
+                                FALSE, FALSE,  0);
+            // gtk_box_pack_start (GTK_BOX (child), button_data->arrow_icon, FALSE, FALSE, 0);
             break;
         case XDG_BUTTON:
         case NORMAL_BUTTON:
         default:
             button_data->label = gtk_label_new (NULL);
-            child = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 2);
+            child = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
             // gtk_box_pack_start (GTK_BOX (child), button_data->image, FALSE, FALSE, 0);
             gtk_box_pack_start (GTK_BOX (child), button_data->label, FALSE, FALSE, 0);
-            gtk_box_pack_start (GTK_BOX (child), button_data->arrow_icon, FALSE, FALSE, 0);
+            button_data->container = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
+            // gtk_box_pack_start (GTK_BOX (button_data->container), gtk_label_new (G_DIR_SEPARATOR_S), FALSE, FALSE, 0);
+            gtk_box_pack_start (GTK_BOX (button_data->container), button_data->button, FALSE, FALSE, 0);
+            gtk_box_pack_start (GTK_BOX (button_data->container),
+                                gtk_image_new_from_icon_name ("nemo-next-symbolic", GTK_ICON_SIZE_MENU),
+                                FALSE, FALSE,  0);
+            // gtk_box_pack_start (GTK_BOX (child), button_data->arrow_icon, FALSE, FALSE, 0);
             button_data->is_base_dir = base_dir;
     }
     if (button_data->label != NULL) {
@@ -1877,7 +1895,7 @@ make_directory_button (NemoPathBar  *path_bar,
     }
 
     gtk_container_add (GTK_CONTAINER (button_data->button), child);
-    gtk_widget_show_all (button_data->button);
+    gtk_widget_show_all (button_data->container);
 
     nemo_path_bar_update_button_state (button_data, current_dir);
 
@@ -1952,7 +1970,7 @@ nemo_path_bar_check_parent_path (NemoPathBar *path_bar,
                                    (list == current_path) ? TRUE : FALSE);
         }
 
-        if (!gtk_widget_get_child_visible (BUTTON_DATA (current_path->data)->button)) {
+        if (!gtk_widget_get_child_visible (BUTTON_DATA (current_path->data)->container)) {
             path_bar->priv->scrolled_root_button = current_path;
             gtk_widget_queue_resize (GTK_WIDGET (path_bar));
         }
@@ -2010,9 +2028,9 @@ nemo_path_bar_update_path (NemoPathBar *path_bar,
     path_bar->priv->fake_root = fake_root;
 
     for (l = path_bar->priv->button_list; l; l = l->next) {
-        GtkWidget *button;
-        button = BUTTON_DATA (l->data)->button;
-        gtk_container_add (GTK_CONTAINER (path_bar), button);
+        GtkWidget *container;
+        container = BUTTON_DATA (l->data)->container;
+        gtk_container_add (GTK_CONTAINER (path_bar), container);
     }
 
     gtk_widget_pop_composite_child ();

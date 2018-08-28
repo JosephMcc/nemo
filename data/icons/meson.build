@@ -19,8 +19,6 @@ publicIcons = [
   'hicolor/actions/scalable/view-compact-symbolic.svg',
   'hicolor/actions/scalable/location-symbolic.svg',
   'hicolor/actions/scalable/mount-archive-symbolic.svg',
-  'hicolor/actions/scalable/nemo-next-symbolic.svg',
-  'hicolor/actions/scalable/nemo-next-symbolic-rtl.svg',
   'hicolor/actions/scalable/sidebar-hide-symbolic.svg',
   'hicolor/actions/scalable/sidebar-show-symbolic.svg',
   'hicolor/actions/scalable/sidebar-tree-symbolic.svg',

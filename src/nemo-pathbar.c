@@ -205,7 +205,7 @@ get_location_button (NemoPathBar *path_bar)
     gtk_widget_push_composite_child ();
 
     button = gtk_button_new ();
-    gtk_style_context_add_class (gtk_widget_get_style_context (button), "slider-button");
+    gtk_style_context_add_class (gtk_widget_get_style_context (button), "path-bar-toggle");
     gtk_button_set_focus_on_click (GTK_BUTTON (button), FALSE);
 
     image = gtk_image_new_from_icon_name ("folder-symbolic", GTK_ICON_SIZE_MENU);

@@ -98,6 +98,10 @@ NemoDesktopWindow GtkPaned {
     color: @theme_fg_color;
 }
 
+.nemo-navigation-bar .path-bar-toggle {
+    padding: 0 4px 0 0;
+}
+
 .nemo-navigation-bar entry {
     border: none;
     background: none;

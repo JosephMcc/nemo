@@ -27,8 +27,7 @@
 
 #include "nemo-toolbar.h"
 
-#include "nemo-location-bar.h"
-#include "nemo-pathbar.h"
+#include "nemo-navigation-bar.h"
 #include "nemo-window-private.h"
 #include "nemo-actions.h"
 #include <glib/gi18n.h>
@@ -61,10 +60,8 @@ struct _NemoToolbarPriv {
     GtkToolItem *tools_box;
     GtkToolItem *view_box;
 
-	GtkWidget *path_bar;
-	GtkWidget *location_bar;
+    NemoNavigationBar *navigation_bar;
     GtkWidget *root_bar;
-    GtkWidget *stack;
 
 	gboolean show_main_bar;
 	gboolean show_location_entry;
@@ -108,11 +105,7 @@ toolbar_update_appearance (NemoToolbar *self)
 	gtk_widget_set_visible (GTK_WIDGET(self->priv->toolbar),
 				self->priv->show_main_bar);
 
-    if (show_location_entry) {
-        gtk_stack_set_visible_child_name (GTK_STACK (self->priv->stack), "location_bar");
-    } else {
-        gtk_stack_set_visible_child_name (GTK_STACK (self->priv->stack), "path_bar");
-    }
+    nemo_navigation_bar_set_show_location_entry (self->priv->navigation_bar, show_location_entry);
 
     gtk_widget_set_visible (self->priv->root_bar,
                 self->priv->show_root_bar);
@@ -279,7 +272,6 @@ nemo_toolbar_constructed (GObject *obj)
     GtkToolItem *tool_box;
     GtkWidget *box;
 	GtkStyleContext *context;
-    GtkWidget *frame;
 
 	G_OBJECT_CLASS (nemo_toolbar_parent_class)->constructed (obj);
 
@@ -355,23 +347,9 @@ nemo_toolbar_constructed (GObject *obj)
     gtk_widget_set_margin_right (GTK_WIDGET (self->priv->location_box), 6);
 
     /* Container to hold the location and pathbars */
-    self->priv->stack = gtk_stack_new();
-    gtk_stack_set_transition_type (GTK_STACK (self->priv->stack), GTK_STACK_TRANSITION_TYPE_CROSSFADE);
-    gtk_stack_set_transition_duration (GTK_STACK (self->priv->stack), 150);
-
-    /* Regular Path Bar */
     hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
-    frame = gtk_frame_new (NULL);
-    gtk_style_context_add_class (gtk_widget_get_style_context (frame), "nemo-navigation-bar");
-    gtk_box_pack_start (GTK_BOX (hbox), frame, TRUE, TRUE, 0);
-    gtk_container_add (GTK_CONTAINER (frame), self->priv->stack);
-
-    self->priv->path_bar = g_object_new (NEMO_TYPE_PATH_BAR, NULL);
-    gtk_stack_add_named(GTK_STACK (self->priv->stack), GTK_WIDGET (self->priv->path_bar), "path_bar");
-    
-    /* Entry-Like Location Bar */
-    self->priv->location_bar = nemo_location_bar_new ();
-    gtk_stack_add_named(GTK_STACK (self->priv->stack), GTK_WIDGET (self->priv->location_bar), "location_bar");
+    self->priv->navigation_bar = nemo_navigation_bar_new ();
+    gtk_box_pack_start (GTK_BOX (hbox), GTK_WIDGET (self->priv->navigation_bar), TRUE, TRUE, 0);
     gtk_widget_show_all (hbox);
 
     tool_box = gtk_tool_item_new ();
@@ -586,13 +564,13 @@ nemo_toolbar_new (GtkActionGroup *action_group)
 GtkWidget *
 nemo_toolbar_get_path_bar (NemoToolbar *self)
 {
-	return self->priv->path_bar;
+	return nemo_navigation_bar_get_path_bar (self->priv->navigation_bar);
 }
 
 GtkWidget *
 nemo_toolbar_get_location_bar (NemoToolbar *self)
 {
-	return self->priv->location_bar;
+	return nemo_navigation_bar_get_location_bar (self->priv->navigation_bar);
 }
 
 gboolean

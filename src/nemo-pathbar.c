@@ -159,8 +159,6 @@ get_slider_button (NemoPathBar     *path_bar,
     GtkWidget *button;
     GtkWidget *image;
 
-    gtk_widget_push_composite_child ();
-
     button = gtk_button_new ();
     gtk_style_context_add_class (gtk_widget_get_style_context (button), "slider-button");
     gtk_button_set_focus_on_click (GTK_BUTTON (button), FALSE);
@@ -178,8 +176,6 @@ get_slider_button (NemoPathBar     *path_bar,
     gtk_container_add (GTK_CONTAINER (button), image);
     gtk_container_add (GTK_CONTAINER (path_bar), button);
     gtk_widget_show_all (button);
-
-    gtk_widget_pop_composite_child ();
 
     return button;
 }
@@ -1899,8 +1895,6 @@ nemo_path_bar_update_path (NemoPathBar *path_bar,
 
     file = nemo_file_get (file_path);
 
-    gtk_widget_push_composite_child ();
-
     while (file != NULL) {
         NemoFile *parent_file;
 
@@ -1930,8 +1924,6 @@ nemo_path_bar_update_path (NemoPathBar *path_bar,
         container = BUTTON_DATA (l->data)->container;
         gtk_container_add (GTK_CONTAINER (path_bar), container);
     }
-
-    gtk_widget_pop_composite_child ();
 
     g_signal_emit (path_bar, path_bar_signals [PATH_SET], 0, file_path);
 }

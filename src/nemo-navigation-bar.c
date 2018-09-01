@@ -30,7 +30,7 @@
 
 struct _NemoNavigationBar
 {
-    GtkFrame parent_instance;
+    GtkBox parent_instance;
 
     NemoPathIndicator *path_indicator;
     GtkWidget *path_bar;
@@ -40,7 +40,7 @@ struct _NemoNavigationBar
     gboolean show_location_entry;
 };
 
-G_DEFINE_TYPE (NemoNavigationBar, nemo_navigation_bar, GTK_TYPE_FRAME)
+G_DEFINE_TYPE (NemoNavigationBar, nemo_navigation_bar, GTK_TYPE_BOX)
 
 static void
 nemo_navigation_bar_init (NemoNavigationBar *self)
@@ -50,7 +50,8 @@ nemo_navigation_bar_init (NemoNavigationBar *self)
     gtk_style_context_add_class (gtk_widget_get_style_context GTK_WIDGET (self), "nemo-navigation-bar");
 
     main_box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
-    gtk_container_add (GTK_CONTAINER (self), main_box);
+    // gtk_container_add (GTK_CONTAINER (self), main_box);
+    gtk_box_pack_start (GTK_BOX (self), main_box, TRUE, TRUE, 0);
 
     self->path_indicator = nemo_path_indicator_new ();
     gtk_box_pack_start (GTK_BOX (main_box), GTK_WIDGET (self->path_indicator), FALSE, FALSE, 0);

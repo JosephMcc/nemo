@@ -4,7 +4,7 @@
 
 #define NEMO_TYPE_NAVIGATION_BAR (nemo_navigation_bar_get_type ())
 
-G_DECLARE_FINAL_TYPE (NemoNavigationBar, nemo_navigation_bar, NEMO, NAVIGATION_BAR, GtkFrame)
+G_DECLARE_FINAL_TYPE (NemoNavigationBar, nemo_navigation_bar, NEMO, NAVIGATION_BAR, GtkBox)
 
 NemoNavigationBar *nemo_navigation_bar_new (void);
 

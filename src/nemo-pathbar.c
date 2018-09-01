@@ -196,10 +196,10 @@ nemo_path_bar_init (NemoPathBar *path_bar)
     gtk_widget_set_has_window (GTK_WIDGET (path_bar), FALSE);
     gtk_widget_set_redraw_on_allocate (GTK_WIDGET (path_bar), FALSE);
 
-    gtk_style_context_add_class (gtk_widget_get_style_context (GTK_WIDGET (path_bar)),
-                                 GTK_STYLE_CLASS_LINKED);
-    gtk_style_context_add_class (gtk_widget_get_style_context (GTK_WIDGET (path_bar)),
-                                 "path-bar");
+    // gtk_style_context_add_class (gtk_widget_get_style_context (GTK_WIDGET (path_bar)),
+    //                              GTK_STYLE_CLASS_LINKED);
+    // gtk_style_context_add_class (gtk_widget_get_style_context (GTK_WIDGET (path_bar)),
+    //                              "path-bar");
 
     p = nemo_get_desktop_directory ();
     path_bar->priv->desktop_path = g_file_new_for_path (p);
@@ -1263,14 +1263,16 @@ make_directory_button (NemoPathBar  *path_bar,
         case DESKTOP_BUTTON:
         case MOUNT_BUTTON:
         {
-            GtkWidget *separator_label;
+            GtkWidget *separator_icon;
 
-            separator_label = gtk_label_new (G_DIR_SEPARATOR_S);
-            gtk_style_context_add_class (gtk_widget_get_style_context (separator_label), "dim-label");
+            // separator_label = gtk_label_new (G_DIR_SEPARATOR_S);
+            // gtk_style_context_add_class (gtk_widget_get_style_context (separator_label), "dim-label");
+            separator_icon = gtk_image_new_from_icon_name ("pan-end-symbolic", GTK_ICON_SIZE_MENU);
+            gtk_style_context_add_class (gtk_widget_get_style_context (separator_icon), "arrow-icon");
             button_data->label = gtk_label_new (NULL);
             child = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
             button_data->container = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
-            gtk_box_pack_start (GTK_BOX (button_data->container), separator_label, FALSE, FALSE, 0);
+            gtk_box_pack_start (GTK_BOX (button_data->container), separator_icon, FALSE, FALSE, 0);
             gtk_box_pack_start (GTK_BOX (button_data->container), button_data->button, FALSE, FALSE,  0);
             gtk_box_pack_start (GTK_BOX (child), button_data->label, FALSE, FALSE, 0);
         }
@@ -1279,14 +1281,16 @@ make_directory_button (NemoPathBar  *path_bar,
         case NORMAL_BUTTON:
         default:
         {
-            GtkWidget *separator_label;
+            GtkWidget *separator_icon;
 
-            separator_label = gtk_label_new (G_DIR_SEPARATOR_S);
-            gtk_style_context_add_class (gtk_widget_get_style_context (separator_label), "dim-label");
+            // separator_label = gtk_label_new (G_DIR_SEPARATOR_S);
+            // gtk_style_context_add_class (gtk_widget_get_style_context (separator_label), "dim-label");
+            separator_icon = gtk_image_new_from_icon_name ("pan-end-symbolic", GTK_ICON_SIZE_MENU);
+            gtk_style_context_add_class (gtk_widget_get_style_context (separator_icon), "arrow-icon");
             button_data->label = gtk_label_new (NULL);
             child = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
             button_data->container = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
-            gtk_box_pack_start (GTK_BOX (button_data->container), separator_label, FALSE, FALSE, 0);
+            gtk_box_pack_start (GTK_BOX (button_data->container), separator_icon, FALSE, FALSE, 0);
             gtk_box_pack_start (GTK_BOX (button_data->container), button_data->button, FALSE, FALSE,  0);
             gtk_box_pack_start (GTK_BOX (child), button_data->label, FALSE, FALSE, 0);
         }

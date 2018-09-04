@@ -71,7 +71,7 @@ NemoDesktopWindow GtkPaned {
 
 /* Navigation bar */
 .nemo-navigation-bar button {
-    padding: 0 4px 0 4px;
+    padding: 0;
     border: none;
     background: none;
     color: @theme_fg_color;
@@ -79,7 +79,9 @@ NemoDesktopWindow GtkPaned {
 
 .nemo-navigation-bar button label,
 .nemo-navigation-bar button image {
+    padding: 0;
     color: @theme_fg_color;
+    opacity: 0.8;
 }
 
 .nemo-navigation-bar button:hover,
@@ -90,12 +92,24 @@ NemoDesktopWindow GtkPaned {
     color: @theme_fg_color;
 }
 
-.nemo-navigation-bar button:checked {
+.nemo-navigation-bar button:hover label,
+.nemo-navigation-bar button:hover image,
+.nemo-navigation-bar button:checked label,
+.nemo-navigation-bar button:checked image,
+.nemo-navigation-bar button:checked:hover label,
+.nemo-navigation-bar button:checked:hover image {
+    border: none;
+    background: none;
     color: @theme_fg_color;
+    opacity: 1.0;
 }
 
-.nemo-navigation-bar button .arrow-icon {
-    opacity: 0.7;
+/*.nemo-navigation-bar button:checked {
+    color: @theme_fg_color;
+}*/
+
+.nemo-navigation-bar .arrow-icon {
+    opacity: 0.8;
 }
 
 .nemo-navigation-bar .nemo-path-indicator {
@@ -105,6 +119,7 @@ NemoDesktopWindow GtkPaned {
 .nemo-navigation-bar entry {
     border: none;
     background: none;
+    padding: 0;
 }
 
 .nemo-navigation-bar {

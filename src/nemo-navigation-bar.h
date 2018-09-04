@@ -6,7 +6,7 @@
 
 G_DECLARE_FINAL_TYPE (NemoNavigationBar, nemo_navigation_bar, NEMO, NAVIGATION_BAR, GtkFrame)
 
-NemoNavigationBar *nemo_navigation_bar_new (void);
+NemoNavigationBar *nemo_navigation_bar_new (GtkActionGroup *action_group);
 
 GtkWidget *nemo_navigation_bar_get_path_bar            (NemoNavigationBar *self);
 GtkWidget *nemo_navigation_bar_get_location_bar        (NemoNavigationBar *self);

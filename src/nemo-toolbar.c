@@ -348,7 +348,7 @@ nemo_toolbar_constructed (GObject *obj)
 
     /* Container to hold the location and pathbars */
     hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
-    self->priv->navigation_bar = nemo_navigation_bar_new ();
+    self->priv->navigation_bar = nemo_navigation_bar_new (self->priv->action_group);
     gtk_box_pack_start (GTK_BOX (hbox), GTK_WIDGET (self->priv->navigation_bar), TRUE, TRUE, 0);
     gtk_widget_show_all (hbox);
 

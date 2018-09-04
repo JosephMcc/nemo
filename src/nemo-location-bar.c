@@ -417,7 +417,8 @@ nemo_location_bar_init (NemoLocationBar *bar)
 
     event_box = gtk_event_box_new ();
     gtk_event_box_set_visible_window (GTK_EVENT_BOX (event_box), FALSE);
-    gtk_container_set_border_width (GTK_CONTAINER (event_box), 2);
+    gtk_widget_set_margin_end (event_box, 6);
+    // gtk_container_set_border_width (GTK_CONTAINER (event_box), 2);
 
 	entry = nemo_location_entry_new ();
 
@@ -428,7 +429,7 @@ nemo_location_bar_init (NemoLocationBar *bar)
 
     gtk_container_add (GTK_CONTAINER (event_box), entry);
 
-	gtk_box_pack_start (GTK_BOX (bar), event_box, TRUE, TRUE, 4);
+	gtk_box_pack_start (GTK_BOX (bar), event_box, TRUE, TRUE, 0);
 
 	/* Label context menu */
 	g_signal_connect (event_box, "button-press-event",

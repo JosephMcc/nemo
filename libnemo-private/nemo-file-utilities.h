@@ -51,6 +51,7 @@ gboolean nemo_is_home_directory                  (GFile *dir);
 gboolean nemo_is_home_directory_file             (GFile *dir,
 						      const char *filename);
 gboolean nemo_is_in_system_dir                   (GFile *location);
+gboolean nemo_is_recent_directory                (GFile *dir);
 char *   nemo_get_gmc_desktop_directory          (void);
 
 gboolean nemo_should_use_templates_directory     (void);

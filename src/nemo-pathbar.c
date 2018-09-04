@@ -57,10 +57,12 @@ typedef enum {
     NORMAL_BUTTON,
     ROOT_BUTTON,
     HOME_BUTTON,
+    RECENT_BUTTON,
+    TRASH_BUTTON,
+    NETWORK_BUTTON,
     DESKTOP_BUTTON,
     MOUNT_BUTTON,
-    XDG_BUTTON,
-    DEFAULT_LOCATION_BUTTON
+    XDG_BUTTON
 } ButtonType;
 
 #define BUTTON_DATA(x) ((ButtonData *)(x))
@@ -965,6 +967,9 @@ nemo_path_bar_update_button_appearance (NemoPathBar *self,
             break;
         case HOME_BUTTON:
         case DESKTOP_BUTTON:
+        case RECENT_BUTTON:
+        case TRASH_BUTTON:
+        case NETWORK_BUTTON:
         case XDG_BUTTON:
             icon_name = nemo_file_get_control_icon_name (button_data->file);
             break;
@@ -1065,6 +1070,8 @@ setup_button_type (ButtonData       *button_data,
            NemoPathBar  *self,
            GFile *location)
 {
+    g_autofree char *uri = NULL;
+
     if (nemo_is_root_directory (location)) {
         button_data->type = ROOT_BUTTON;
     } else if (nemo_is_home_directory (location)) {
@@ -1076,6 +1083,9 @@ setup_button_type (ButtonData       *button_data,
         } else {
             button_data->type = NORMAL_BUTTON;
         }
+    } else if (nemo_is_recent_directory (location)) {
+        button_data->type = RECENT_BUTTON;
+        button_data->is_root = TRUE;
     } else if (self->xdg_documents_path != NULL && g_file_equal (location, self->xdg_documents_path)) {
         button_data->type = XDG_BUTTON;
         button_data->is_root = TRUE;
@@ -1099,6 +1109,12 @@ setup_button_type (ButtonData       *button_data,
         button_data->is_root = TRUE;
     } else if (setup_file_path_mounted_mount (location, button_data)) {
         /* already setup */
+    } else if (strcmp ((uri = g_file_get_uri (location)), "trash:///") == 0) {
+        button_data->type = TRASH_BUTTON;
+        button_data->is_root = TRUE;
+    } else if (strcmp (uri, "network:///") == 0) {
+        button_data->type = NETWORK_BUTTON;
+        button_data->is_root = TRUE;
     } else {
         button_data->type = NORMAL_BUTTON;
     }
@@ -1293,6 +1309,9 @@ make_directory_button (NemoPathBar  *self,
         case ROOT_BUTTON:
         case HOME_BUTTON:
         case DESKTOP_BUTTON:
+        case RECENT_BUTTON:
+        case TRASH_BUTTON:
+        case NETWORK_BUTTON:
         case MOUNT_BUTTON:
         case XDG_BUTTON:
         {

@@ -35,7 +35,5 @@ void         nemo_path_bar_set_path            (NemoPathBar *path_bar,
 GFile       *nemo_path_bar_get_path_for_button (NemoPathBar *path_bar,
                                                 GtkWidget   *button);
 void         nemo_path_bar_clear_buttons       (NemoPathBar *path_bar);
-void         nemo_path_bar_set_indicator       (NemoPathBar       *self,
-                                                NemoPathIndicator *indicator);
 
 #endif /* NEMO_PATHBAR_H */

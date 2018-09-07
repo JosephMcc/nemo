@@ -154,26 +154,8 @@ nemo_path_bar_set_property (GObject      *object,
     switch (prop_id)
     {
         case PROP_INDICATOR:
-            nemo_path_bar_set_indicator (self, g_value_get_object (value));
-            break;
-        default:
-            G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
-            break;
-    }
-}
-
-static void
-nemo_path_bar_get_property (GObject    *object,
-                            guint       prop_id,
-                            GValue     *value,
-                            GParamSpec *pspec)
-{
-    NemoPathBar *self = NEMO_PATH_BAR (object);
-
-    switch (prop_id)
-    {
-        case PROP_INDICATOR:
-            g_value_set_object (value, self->indicator);
+            // nemo_path_bar_set_indicator (self, g_value_get_object (value));
+            self->indicator = g_value_dup_object (value);
             break;
         default:
             G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -311,7 +293,11 @@ remove_settings_signal (NemoPathBar *self,
 static void
 nemo_path_bar_dispose (GObject *object)
 {
-    remove_settings_signal (NEMO_PATH_BAR (object), gtk_widget_get_screen (GTK_WIDGET (object)));
+    NemoPathBar *self = NEMO_PATH_BAR (object);
+
+    remove_settings_signal (self, gtk_widget_get_screen (GTK_WIDGET (self)));
+
+    g_clear_object (&self->indicator);
 
     G_OBJECT_CLASS (nemo_path_bar_parent_class)->dispose (object);
 }
@@ -762,7 +748,6 @@ nemo_path_bar_class_init (NemoPathBarClass *path_bar_class)
     gobject_class->finalize = nemo_path_bar_finalize;
     gobject_class->dispose = nemo_path_bar_dispose;
     gobject_class->set_property = nemo_path_bar_set_property;
-    gobject_class->get_property = nemo_path_bar_get_property;
 
     widget_class->get_preferred_height = nemo_path_bar_get_preferred_height;
     widget_class->get_preferred_width = nemo_path_bar_get_preferred_width;
@@ -803,11 +788,11 @@ nemo_path_bar_class_init (NemoPathBarClass *path_bar_class)
                              "Indicator",
                              "Indicator associated with the pathbar",
                              NEMO_TYPE_PATH_INDICATOR,
-                             G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
+                             G_PARAM_WRITABLE | G_PARAM_STATIC_STRINGS);
 
     g_object_class_install_properties (gobject_class, N_PROPERTIES, obj_properties);
 
-     gtk_container_class_handle_border_width (container_class);
+    gtk_container_class_handle_border_width (container_class);
 }
 
 /* Changes the icons wherever it is needed */
@@ -1080,6 +1065,7 @@ setup_button_type (ButtonData       *button_data,
     } else if (nemo_is_desktop_directory (location)) {
         if (!desktop_is_home) {
             button_data->type = DESKTOP_BUTTON;
+            button_data->is_root = TRUE;
         } else {
             button_data->type = NORMAL_BUTTON;
         }
@@ -1521,18 +1507,4 @@ nemo_path_bar_get_path_for_button (NemoPathBar *self,
     }
 
     return NULL;
-}
-
-void
-nemo_path_bar_set_indicator (NemoPathBar       *self,
-                             NemoPathIndicator *indicator)
-{
-    g_return_if_fail (NEMO_IS_PATH_BAR (self));
-    g_return_if_fail (NEMO_IS_PATH_INDICATOR (indicator) || indicator == NULL);
-
-    if (self->indicator == indicator) {
-        return;
-    }
-
-    self->indicator = indicator;
 }

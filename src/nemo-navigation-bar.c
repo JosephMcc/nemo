@@ -80,7 +80,7 @@ nemo_navigation_bar_constructed (GObject *object)
 
     G_OBJECT_CLASS (nemo_navigation_bar_parent_class)->constructed (object);
 
-    gtk_style_context_add_class (gtk_widget_get_style_context GTK_WIDGET (self), "nemo-navigation-bar");
+    gtk_style_context_add_class (gtk_widget_get_style_context (GTK_WIDGET (self)), "nemo-navigation-bar");
 
     main_box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
     gtk_container_add (GTK_CONTAINER (self), main_box);

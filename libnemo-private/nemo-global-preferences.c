@@ -182,7 +182,7 @@ static void
 on_time_data_changed (gpointer user_data)
 {
     prefs_current_date_format = g_settings_get_enum (nemo_preferences, NEMO_PREFERENCES_DATE_FORMAT);
-    prefs_current_24h_time_format = g_settings_get_boolean (cinnamon_interface_preferences, "clock-use-24h");
+    prefs_current_24h_time_format = g_settings_get_boolean (nemo_desktop_preferences, "clock-use-24h");
 
     if (prefs_current_timezone != NULL) {
         g_time_zone_unref (prefs_current_timezone);
@@ -202,7 +202,7 @@ setup_cached_time_data (void)
                               "changed::" NEMO_PREFERENCES_DATE_FORMAT,
                               G_CALLBACK (on_time_data_changed), NULL);
 
-    g_signal_connect_swapped (cinnamon_interface_preferences,
+    g_signal_connect_swapped (nemo_desktop_preferences,
                               "changed::clock-use-24h",
                               G_CALLBACK (on_time_data_changed), NULL);
 
@@ -237,13 +237,12 @@ nemo_global_preferences_init (void)
 	nemo_compact_view_preferences = g_settings_new("org.nemo.compact-view");
 	nemo_desktop_preferences = g_settings_new("org.nemo.desktop");
 	nemo_tree_sidebar_preferences = g_settings_new("org.nemo.sidebar-panels.tree");
-    nemo_plugin_preferences = g_settings_new("org.nemo.plugins");
-	gnome_lockdown_preferences = g_settings_new("org.cinnamon.desktop.lockdown");
-	gnome_background_preferences = g_settings_new("org.cinnamon.desktop.background");
-	gnome_media_handling_preferences = g_settings_new("org.cinnamon.desktop.media-handling");
-	gnome_terminal_preferences = g_settings_new("org.cinnamon.desktop.default-applications.terminal");
-    cinnamon_privacy_preferences = g_settings_new("org.cinnamon.desktop.privacy");
-	cinnamon_interface_preferences = g_settings_new ("org.cinnamon.desktop.interface");
+  nemo_plugin_preferences = g_settings_new("org.nemo.plugins");
+  gnome_lockdown_preferences = g_settings_new("org.gnome.desktop.lockdown");
+  gnome_background_preferences = g_settings_new("org.gnome.desktop.background");
+  gnome_media_handling_preferences = g_settings_new("org.gnome.desktop.media-handling");
+  gnome_terminal_preferences = g_settings_new("org.gnome.desktop.default-applications.terminal");
+  nemo_privacy_preferences = g_settings_new("org.nemo.privacy");
 
     ignore_view_metadata = g_settings_get_boolean (nemo_preferences, NEMO_PREFERENCES_IGNORE_VIEW_METADATA);
 
@@ -272,6 +271,5 @@ nemo_global_preferences_finalize (void)
     g_object_unref (gnome_background_preferences);
     g_object_unref (gnome_media_handling_preferences);
     g_object_unref (gnome_terminal_preferences);
-    g_object_unref (cinnamon_privacy_preferences);
-    g_object_unref (cinnamon_interface_preferences);
+    g_object_unref (nemo_privacy_preferences);
 }

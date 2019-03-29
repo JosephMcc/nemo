@@ -478,6 +478,14 @@
     </key>
   </schema>
 
+  <schema id="org.nemo.privacy" path="/org/nemo/privacy/" gettext-domain="nemo">
+    <key type="b" name="remember-recent-files">
+      <default>true</default>
+      <summary>Whether to remember recently used files</summary>
+      <description>If FALSE, Nemo will not display Recent item in the sidebar which displays recently used files.</description>
+    </key>
+  </schema>
+
   <schema id="org.nemo.sidebar-panels" path="/org/nemo/sidebar-panels/" gettext-domain="nemo">
     <child name="tree" schema="org.nemo.sidebar-panels.tree"/>
   </schema>
@@ -492,7 +500,7 @@
 
   <schema id="org.nemo.desktop" path="/org/nemo/desktop/" gettext-domain="nemo">
     <key name="font" type="s">
-      <default l10n="messages" context="desktop-font">'Noto Sans 10'</default>
+      <default l10n="messages" context="desktop-font">'Ubuntu 11'</default>
       <summary>Desktop font</summary>
       <description>The font description used for the icons on the desktop.</description>
     </key>
@@ -500,6 +508,11 @@
       <default>"true::false"</default>
       <summary>Desktop layout</summary>
       <description>Format bool:bool, show desktop folder on primary monitor:show desktop on remaining monitors</description>
+    </key>
+    <key name="clock-use-24h" type="b">
+      <default>true</default>
+      <summary>Use 24h format</summary>
+      <description>Use 24h format if true.</description>
     </key>
     <key name="show-orphaned-desktop-icons" type="b">
       <default>true</default>

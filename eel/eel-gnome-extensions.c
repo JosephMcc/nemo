@@ -43,7 +43,7 @@ prepend_terminal_to_command_line (const char *command_line)
 
     g_return_val_if_fail (command_line != NULL, g_strdup (command_line));
 
-    settings = g_settings_new ("org.cinnamon.desktop.default-applications.terminal");
+    settings = g_settings_new ("org.gnome.desktop.default-applications.terminal");
     terminal = g_settings_get_string (settings, "exec");
 
     if (terminal != NULL) {

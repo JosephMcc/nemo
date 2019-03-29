@@ -21,6 +21,7 @@ nemo_private_sources = [
   'nemo-dbus-manager.c',
   'nemo-debug.c',
   'nemo-default-file-icon.c',
+  'nemo-desktop-background.c',
   'nemo-desktop-directory-file.c',
   'nemo-desktop-directory.c',
   'nemo-desktop-icon-file.c',

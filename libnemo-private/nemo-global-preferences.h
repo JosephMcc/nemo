@@ -284,8 +284,7 @@ GSettings *gnome_lockdown_preferences;
 GSettings *gnome_background_preferences;
 GSettings *gnome_media_handling_preferences;
 GSettings *gnome_terminal_preferences;
-GSettings *cinnamon_privacy_preferences;
-GSettings *cinnamon_interface_preferences;
+GSettings *nemo_privacy_preferences;
 
 /* Cached for fast access and used in nemo-file.c for constructing date/time strings */
 GTimeZone      *prefs_current_timezone;

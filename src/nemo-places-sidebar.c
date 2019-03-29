@@ -668,7 +668,7 @@ home_on_different_fs (const gchar *home_uri)
 static gboolean
 recent_is_supported (void)
 {
-    if (!g_settings_get_boolean (cinnamon_privacy_preferences, NEMO_PREFERENCES_RECENT_ENABLED))
+    if (!g_settings_get_boolean (nemo_privacy_preferences, NEMO_PREFERENCES_RECENT_ENABLED))
         return FALSE;
 
     const char * const *supported;
@@ -4209,7 +4209,7 @@ nemo_places_sidebar_init (NemoPlacesSidebar *sidebar)
 				  G_CALLBACK(desktop_setting_changed_callback),
 				  sidebar);
 
-    g_signal_connect_swapped (cinnamon_privacy_preferences, "changed::" NEMO_PREFERENCES_RECENT_ENABLED,
+    g_signal_connect_swapped (nemo_privacy_preferences, "changed::" NEMO_PREFERENCES_RECENT_ENABLED,
                   G_CALLBACK(desktop_setting_changed_callback),
                   sidebar);
 
@@ -4283,7 +4283,7 @@ nemo_places_sidebar_dispose (GObject *object)
 					      desktop_setting_changed_callback,
 					      sidebar);
 
-    g_signal_handlers_disconnect_by_func (cinnamon_privacy_preferences,
+    g_signal_handlers_disconnect_by_func (nemo_privacy_preferences,
                           desktop_setting_changed_callback,
                           sidebar);
 

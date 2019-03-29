@@ -45,6 +45,7 @@
 #include <fcntl.h>
 #include <gdk/gdkx.h>
 #include <glib/gi18n.h>
+#include <libnemo-private/nemo-desktop-background.h>
 #include <libnemo-private/nemo-desktop-icon-file.h>
 #include <libnemo-private/nemo-directory-notify.h>
 #include <libnemo-private/nemo-file-changes-queue.h>
@@ -81,6 +82,7 @@ struct NemoDesktopIconGridViewDetails
 	guint reload_desktop_timeout;
 	gboolean pending_rescan;
     gboolean updating_menus;
+    NemoDesktopBackground *background;
 };
 
 typedef struct {
@@ -172,6 +174,22 @@ gdk_filter_func (GdkXEvent *gdk_xevent,
     }
 
     return GDK_FILTER_CONTINUE;
+}
+
+static void
+real_begin_loading (NemoView *object)
+{
+ NemoIconContainer *icon_container;
+ NemoDesktopIconGridView *view;
+
+ view = NEMO_DESKTOP_ICON_GRID_VIEW (object);
+
+ icon_container = get_icon_container (view);
+ if (view->details->background == NULL) {
+   view->details->background = nemo_desktop_background_new (icon_container);
+ }
+
+ NEMO_VIEW_CLASS (nemo_desktop_icon_grid_view_parent_class)->begin_loading (object);
 }
 
 static const char *
@@ -352,6 +370,11 @@ nemo_desktop_icon_grid_view_dispose (GObject *object)
 					      nemo_view_update_menus,
 					      icon_view);
 
+  if (icon_view->details->background != NULL) {
+   g_object_unref (icon_view->details->background);
+   icon_view->details->background = NULL;
+ }
+
 	G_OBJECT_CLASS (nemo_desktop_icon_grid_view_parent_class)->dispose (object);
 }
 
@@ -367,6 +390,7 @@ nemo_desktop_icon_grid_view_class_init (NemoDesktopIconGridViewClass *class)
 
     NEMO_ICON_VIEW_CLASS (class)->use_grid_container = TRUE;
 
+  vclass->begin_loading = real_begin_loading;
 	vclass->merge_menus = real_merge_menus;
 	vclass->update_menus = real_update_menus;
 	vclass->get_view_id = real_get_id;

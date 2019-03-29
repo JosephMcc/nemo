@@ -55,6 +55,7 @@
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
 
+#include <libnemo-private/nemo-desktop-background.h>
 #include <libnemo-private/nemo-file-utilities.h>
 #include <libnemo-private/nemo-file-changes-queue.h>
 #include <stdio.h>
